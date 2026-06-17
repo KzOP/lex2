@@ -1,0 +1,1034 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: LexBridge Saudi - Legal Awareness Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: systems
+    description: Legal systems operations
+  - name: articles
+    description: Articles operations
+  - name: legalTerms
+    description: Legal dictionary operations
+  - name: faq
+    description: FAQ operations
+  - name: ai
+    description: AI assistant operations
+  - name: admin
+    description: Admin operations
+  - name: quiz
+    description: Legal knowledge quiz operations
+  - name: search
+    description: Global search operations
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /systems:
+    get:
+      operationId: listSystems
+      tags: [systems]
+      summary: List all legal systems
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of legal systems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LegalSystem"
+    post:
+      operationId: createSystem
+      tags: [systems, admin]
+      summary: Create a new legal system (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LegalSystemInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalSystem"
+
+  /systems/{id}:
+    get:
+      operationId: getSystem
+      tags: [systems]
+      summary: Get a legal system by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Legal system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalSystem"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      operationId: updateSystem
+      tags: [systems, admin]
+      summary: Update a legal system (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LegalSystemUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalSystem"
+    delete:
+      operationId: deleteSystem
+      tags: [systems, admin]
+      summary: Delete a legal system (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /systems/stats:
+    get:
+      operationId: getSystemsStats
+      tags: [systems]
+      summary: Get platform statistics
+      responses:
+        "200":
+          description: Platform statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  /systems/compare:
+    post:
+      operationId: compareSystems
+      tags: [systems]
+      summary: Compare multiple legal systems
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompareSystemsInput"
+      responses:
+        "200":
+          description: Compared systems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LegalSystem"
+
+  /articles:
+    get:
+      operationId: listArticles
+      tags: [articles]
+      summary: List articles
+      parameters:
+        - name: systemId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: featured
+          in: query
+          schema:
+            type: ["boolean", "null"]
+      responses:
+        "200":
+          description: List of articles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+    post:
+      operationId: createArticle
+      tags: [articles, admin]
+      summary: Create article (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+
+  /articles/{id}:
+    patch:
+      operationId: updateArticle
+      tags: [articles, admin]
+      summary: Update article (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+    delete:
+      operationId: deleteArticle
+      tags: [articles, admin]
+      summary: Delete article (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /legal-terms:
+    get:
+      operationId: listLegalTerms
+      tags: [legalTerms]
+      summary: List legal terms
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: letter
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of legal terms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LegalTerm"
+    post:
+      operationId: createLegalTerm
+      tags: [legalTerms, admin]
+      summary: Create legal term (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LegalTermInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalTerm"
+
+  /legal-terms/{id}:
+    patch:
+      operationId: updateLegalTerm
+      tags: [legalTerms, admin]
+      summary: Update legal term (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LegalTermUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LegalTerm"
+    delete:
+      operationId: deleteLegalTerm
+      tags: [legalTerms, admin]
+      summary: Delete legal term (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /faq:
+    get:
+      operationId: listFaqItems
+      tags: [faq]
+      summary: List FAQ items
+      parameters:
+        - name: systemId
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: FAQ list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FaqItem"
+    post:
+      operationId: createFaqItem
+      tags: [faq, admin]
+      summary: Create FAQ item (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FaqItemInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FaqItem"
+
+  /faq/{id}:
+    patch:
+      operationId: updateFaqItem
+      tags: [faq, admin]
+      summary: Update a FAQ item (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FaqItemUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FaqItem"
+    delete:
+      operationId: deleteFaqItem
+      tags: [faq, admin]
+      summary: Delete FAQ item (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /ai/chat:
+    post:
+      operationId: aiChat
+      tags: [ai]
+      summary: Send message to AI legal assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiChatInput"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiReply"
+
+  /quiz/questions:
+    get:
+      operationId: listQuizQuestions
+      tags: [quiz]
+      summary: Get quiz questions
+      parameters:
+        - name: systemId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: limit
+          in: query
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: Quiz questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
+
+  /quiz/submit:
+    post:
+      operationId: submitQuiz
+      tags: [quiz]
+      summary: Submit quiz answers and get score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizSubmission"
+      responses:
+        "200":
+          description: Quiz result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizResult"
+
+  /search:
+    get:
+      operationId: globalSearch
+      tags: [search]
+      summary: Search across all content
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResults"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    LegalSystem:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        nameAr:
+          type: string
+        nameEn:
+          type: string
+        category:
+          type: string
+        icon:
+          type: string
+        descriptionAr:
+          type: string
+        objectiveAr:
+          type: string
+        obligationsAr:
+          type: string
+        commonViolationsAr:
+          type: string
+        penaltiesAr:
+          type: string
+        complianceTipsAr:
+          type: string
+        sourceUrl:
+          type: string
+        officialReference:
+          type: string
+        lastUpdated:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - slug
+        - nameAr
+        - nameEn
+        - category
+        - icon
+        - descriptionAr
+        - objectiveAr
+        - obligationsAr
+        - commonViolationsAr
+        - penaltiesAr
+        - complianceTipsAr
+        - sourceUrl
+        - officialReference
+        - lastUpdated
+        - isActive
+        - createdAt
+        - updatedAt
+
+    LegalSystemInput:
+      type: object
+      properties:
+        slug:
+          type: string
+        nameAr:
+          type: string
+        nameEn:
+          type: string
+        category:
+          type: string
+        icon:
+          type: string
+        descriptionAr:
+          type: string
+        objectiveAr:
+          type: string
+        obligationsAr:
+          type: string
+        commonViolationsAr:
+          type: string
+        penaltiesAr:
+          type: string
+        complianceTipsAr:
+          type: string
+        sourceUrl:
+          type: string
+        officialReference:
+          type: string
+        lastUpdated:
+          type: string
+        isActive:
+          type: boolean
+      required:
+        - slug
+        - nameAr
+        - nameEn
+        - category
+        - icon
+        - descriptionAr
+        - objectiveAr
+        - obligationsAr
+        - commonViolationsAr
+        - penaltiesAr
+        - complianceTipsAr
+        - sourceUrl
+        - officialReference
+        - lastUpdated
+
+    LegalSystemUpdate:
+      type: object
+      properties:
+        slug:
+          type: string
+        nameAr:
+          type: string
+        nameEn:
+          type: string
+        category:
+          type: string
+        icon:
+          type: string
+        descriptionAr:
+          type: string
+        objectiveAr:
+          type: string
+        obligationsAr:
+          type: string
+        commonViolationsAr:
+          type: string
+        penaltiesAr:
+          type: string
+        complianceTipsAr:
+          type: string
+        sourceUrl:
+          type: string
+        officialReference:
+          type: string
+        lastUpdated:
+          type: string
+        isActive:
+          type: boolean
+
+    PlatformStats:
+      type: object
+      properties:
+        totalSystems:
+          type: integer
+        totalArticles:
+          type: integer
+        totalTerms:
+          type: integer
+        totalFaq:
+          type: integer
+        categories:
+          type: array
+          items:
+            type: string
+      required:
+        - totalSystems
+        - totalArticles
+        - totalTerms
+        - totalFaq
+        - categories
+
+    CompareSystemsInput:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - ids
+
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+        systemId:
+          type: ["integer", "null"]
+        titleAr:
+          type: string
+        contentAr:
+          type: string
+        isFeatured:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - titleAr
+        - contentAr
+        - isFeatured
+        - createdAt
+        - updatedAt
+
+    ArticleInput:
+      type: object
+      properties:
+        systemId:
+          type: ["integer", "null"]
+        titleAr:
+          type: string
+        contentAr:
+          type: string
+        isFeatured:
+          type: boolean
+      required:
+        - titleAr
+        - contentAr
+
+    ArticleUpdate:
+      type: object
+      properties:
+        systemId:
+          type: ["integer", "null"]
+        titleAr:
+          type: string
+        contentAr:
+          type: string
+        isFeatured:
+          type: boolean
+
+    LegalTerm:
+      type: object
+      properties:
+        id:
+          type: integer
+        termAr:
+          type: string
+        termEn:
+          type: string
+        definitionAr:
+          type: string
+        systemId:
+          type: ["integer", "null"]
+        needsReview:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - termAr
+        - termEn
+        - definitionAr
+        - needsReview
+        - createdAt
+
+    LegalTermInput:
+      type: object
+      properties:
+        termAr:
+          type: string
+        termEn:
+          type: string
+        definitionAr:
+          type: string
+        systemId:
+          type: ["integer", "null"]
+        needsReview:
+          type: boolean
+      required:
+        - termAr
+        - termEn
+        - definitionAr
+
+    LegalTermUpdate:
+      type: object
+      properties:
+        termAr:
+          type: string
+        termEn:
+          type: string
+        definitionAr:
+          type: string
+        systemId:
+          type: ["integer", "null"]
+        needsReview:
+          type: boolean
+
+    FaqItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        systemId:
+          type: ["integer", "null"]
+        questionAr:
+          type: string
+        answerAr:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - questionAr
+        - answerAr
+        - createdAt
+
+    FaqItemInput:
+      type: object
+      properties:
+        systemId:
+          type: ["integer", "null"]
+        questionAr:
+          type: string
+        answerAr:
+          type: string
+      required:
+        - questionAr
+        - answerAr
+
+    FaqItemUpdate:
+      type: object
+      properties:
+        systemId:
+          type: ["integer", "null"]
+        questionAr:
+          type: string
+        answerAr:
+          type: string
+
+    AiChatInput:
+      type: object
+      properties:
+        message:
+          type: string
+        conversationHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+      required:
+        - message
+
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+      required:
+        - role
+        - content
+
+    AiSource:
+      type: object
+      properties:
+        type:
+          type: string
+        label:
+          type: string
+        reference:
+          type: string
+      required:
+        - type
+        - label
+
+    AiReply:
+      type: object
+      properties:
+        response:
+          type: string
+        disclaimer:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiSource"
+        hasContext:
+          type: boolean
+      required:
+        - response
+        - disclaimer
+        - hasContext
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        systemId:
+          type: ["integer", "null"]
+        questionAr:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        correctIndex:
+          type: integer
+        explanationAr:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - questionAr
+        - options
+        - correctIndex
+        - explanationAr
+        - createdAt
+
+    QuizSubmission:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizAnswer"
+      required:
+        - answers
+
+    QuizAnswer:
+      type: object
+      properties:
+        questionId:
+          type: integer
+        selectedIndex:
+          type: integer
+      required:
+        - questionId
+        - selectedIndex
+
+    QuizResult:
+      type: object
+      properties:
+        score:
+          type: integer
+        total:
+          type: integer
+        percentage:
+          type: number
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizAnswerDetail"
+      required:
+        - score
+        - total
+        - percentage
+        - details
+
+    QuizAnswerDetail:
+      type: object
+      properties:
+        questionId:
+          type: integer
+        questionAr:
+          type: string
+        selectedIndex:
+          type: integer
+        correctIndex:
+          type: integer
+        isCorrect:
+          type: boolean
+        explanationAr:
+          type: string
+      required:
+        - questionId
+        - questionAr
+        - selectedIndex
+        - correctIndex
+        - isCorrect
+        - explanationAr
+
+    SearchResultItem:
+      type: object
+      properties:
+        type:
+          type: string
+        id:
+          type: integer
+        titleAr:
+          type: string
+        snippetAr:
+          type: string
+        systemNameAr:
+          type: ["string", "null"]
+        url:
+          type: string
+      required:
+        - type
+        - id
+        - titleAr
+        - snippetAr
+        - url
+
+    SearchResults:
+      type: object
+      properties:
+        query:
+          type: string
+        total:
+          type: integer
+        systems:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResultItem"
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResultItem"
+        terms:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResultItem"
+        faq:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResultItem"
+      required:
+        - query
+        - total
+        - systems
+        - articles
+        - terms
+        - faq
