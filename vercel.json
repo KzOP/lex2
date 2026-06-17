@@ -1,0 +1,13 @@
+{
+  "buildCommand": "pnpm run typecheck:libs && pnpm --filter @workspace/lexbridge run build",
+  "outputDirectory": "artifacts/lexbridge/dist/public",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "framework": null,
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "BASE_PATH": "/",
+    "NODE_ENV": "production"
+  }
+}
